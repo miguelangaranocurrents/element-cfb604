@@ -285,6 +285,12 @@ export class TextualBodyViewModel
             return;
         }
 
+        // User pills open the user's profile in the right panel via their own click handler,
+        // so this capture-phase handler must not navigate them away from the room.
+        if (target.classList?.contains("mx_UserPill")) {
+            return;
+        }
+
         const localHref = tryTransformPermalinkToLocalHref(target.href);
         if (localHref !== target.href) {
             event.preventDefault();

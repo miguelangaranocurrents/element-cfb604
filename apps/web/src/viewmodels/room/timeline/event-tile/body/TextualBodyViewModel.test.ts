@@ -273,6 +273,24 @@ describe("TextualBodyViewModel", () => {
         expect(window.location.hash).toBe("#/room/!room:example.org");
     });
 
+    it("leaves user pill clicks to the pill so the profile opens instead of navigating", () => {
+        const vm = createVm();
+        const preventDefault = vi.fn();
+        vi.spyOn(permalinkUtils, "tryTransformPermalinkToLocalHref").mockReturnValue("#/user/@bot:example.org");
+
+        vm.onRootClick({
+            preventDefault,
+            target: {
+                nodeName: "A",
+                href: "https://matrix.to/#/@bot:example.org",
+                classList: { contains: (className: string) => className === "mx_UserPill" },
+            },
+        } as any);
+
+        expect(preventDefault).not.toHaveBeenCalled();
+        expect(window.location.hash).toBe("");
+    });
+
     it("leaves external root clicks alone when no local permalink is found", () => {
         const vm = createVm();
         const preventDefault = vi.fn();
