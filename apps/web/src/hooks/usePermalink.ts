@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only OR LicenseRef-Element-Com
 Please see LICENSE files in the repository root for full details.
 */
 
-import { type MatrixEvent, type Room, type RoomMember } from "matrix-js-sdk/src/matrix";
+import { type MatrixEvent, type Room, type RoomMember, User } from "matrix-js-sdk/src/matrix";
 
 import { type ButtonEvent } from "../components/views/elements/AccessibleButton";
 import { PillType } from "../components/views/elements/PillType";
@@ -142,14 +142,16 @@ export const usePermalink: (args: Args) => HookResult = ({
 
     if (type === PillType.AtRoomMention && permalinkRoom) {
         text = "@room";
-    } else if (type === PillType.UserMention && member) {
-        text = member.name || resourceId;
+    } else if (type === PillType.UserMention) {
+        text = member?.name || resourceId;
         onClick = (e: ButtonEvent): void => {
+            // Always handle the click ourselves: the pill is an anchor to the user's matrix.to link and
+            // must not navigate away from the room, even if the member has not been resolved yet.
             e.preventDefault();
             e.stopPropagation();
             dis.dispatch({
                 action: Action.ViewUser,
-                member: member,
+                member: member ?? (resourceId ? new User(resourceId) : undefined),
             });
         };
     } else if (type === PillType.RoomMention) {
