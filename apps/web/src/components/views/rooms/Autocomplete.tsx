@@ -271,55 +271,6 @@ export default class Autocomplete extends React.PureComponent<IProps, IState> {
     }
 
     public componentDidUpdate(prevProps: IProps): void {
-        // TEMP-DEBUG-START
-        if (this.state.completions.length > 0) {
-            setTimeout(() => {
-                const el = document.getElementById("mx_Autocomplete");
-                if (!el) return;
-                const chain: string[] = [];
-                let n: HTMLElement | null = el;
-                for (let i = 0; n && i < 30; i++) {
-                    const cs = getComputedStyle(n);
-                    const rr = n.getBoundingClientRect();
-                    chain.push(
-                        `${n.tagName}.${String(n.className).slice(0, 60)}|pos=${cs.position}|z=${cs.zIndex}|ov=${cs.overflowX}/${cs.overflowY}|tr=${cs.transform}|op=${cs.opacity}|ct=${cs.contain}|top=${Math.round(rr.top)}|bot=${Math.round(rr.bottom)}`,
-                    );
-                    n = n.parentElement;
-                }
-                console.log("AUTODBG chain\n" + chain.join("\n"));
-                const rect = el.getBoundingClientRect();
-                const pts = [0.1, 0.5, 0.9].map((f) => {
-                    const x = rect.left + rect.width * 0.5;
-                    const y = rect.top + rect.height * f;
-                    const hit = document.elementFromPoint(x, y);
-                    return `${f}:${Math.round(y)}->${hit?.tagName}.${String(hit?.className).slice(0, 60)}`;
-                });
-                console.log("AUTODBG rect " + JSON.stringify(rect) + " hits " + pts.join(" | "));
-                const extra = (e: Element | null): string => {
-                    if (!e) return "null";
-                    const cs = getComputedStyle(e);
-                    return `${e.tagName}.${String(e.className).slice(0, 50)}|pos=${cs.position}|z=${cs.zIndex}|pe=${cs.pointerEvents}|vis=${cs.visibility}|wc=${cs.willChange}|flt=${cs.filter}|iso=${cs.isolation}|cv=${cs.contentVisibility}|ct=${cs.contain}|mb=${cs.mixBlendMode}|ov=${cs.overflowX}/${cs.overflowY}`;
-                };
-                const cx = rect.left + rect.width * 0.5;
-                const cy = rect.top + rect.height * 0.5;
-                console.log("AUTODBG auto " + extra(el));
-                console.log("AUTODBG firstchild " + extra(el.firstElementChild));
-                console.log("AUTODBG newroomintro " + extra(document.querySelector(".mx_NewRoomIntro")));
-                console.log("AUTODBG tile " + extra(el.closest(".mx_EventTile")));
-                console.log("AUTODBG tileline " + extra(el.closest(".mx_EventTile_line")));
-                const stack = document.elementsFromPoint(cx, cy).slice(0, 6);
-                console.log("AUTODBG stack " + stack.map((s) => extra(s)).join(" || "));
-                const ntc = document.querySelector(".mx_NewRoomIntro");
-                let nn: Element | null = ntc;
-                const nchain: string[] = [];
-                for (let i = 0; nn && i < 8; i++) {
-                    nchain.push(extra(nn));
-                    nn = nn.parentElement;
-                }
-                console.log("AUTODBG nchain " + nchain.join(" >> "));
-            }, 500);
-        }
-        // TEMP-DEBUG-END
         this.applyNewProps(prevProps.query, prevProps.room);
         // this is the selected completion, so scroll it into view if needed
         const selectedCompletion = this.completionRefs[`completion${this.state.selectionOffset}`]?.current;
